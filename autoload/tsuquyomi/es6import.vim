@@ -484,8 +484,11 @@ function! tsuquyomi#es6import#complete()
     let l:target_import = l:same_path_import_list[0]
     if l:target_import.is_oneliner
       let l:line = getline(l:target_import.brace.end.line)
-      let l:injection_position = target_import.brace.end.offset - 2 - strlen(l:curly_spacing)
-      let l:expression = l:line[0:l:injection_position].', '.l:block.identifier.l:curly_spacing.l:line[l:target_import.brace.end.offset - 1: -1]
+      let l:injection_position = match(l:line, '\v\S\zs\s*%' . string(target_import.brace.end.offset - 1) . 'c')
+      echom l:injection_position
+      let l:expression = l:line[0:l:injection_position] . ', ' .
+                       \ l:block.identifier . l:curly_spacing .
+                       \ l:line[l:target_import.brace.end.offset - 1: -1]
       call setline(l:target_import.brace.end.line, l:expression)
     else
       let l:before_line = getline(l:target_import.brace.end.line - 1)
